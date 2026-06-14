@@ -1,0 +1,1414 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070a12">
+  <meta name="description" content="FIFAワールドカップ2026の全104試合を日本時間・結果・国内視聴情報つきで確認できるマッチセンター。">
+  <title>WORLD CUP 2026 | ALL MATCH CENTER</title>
+  <style>
+    :root {
+      --ink: #f7f8fc;
+      --muted: #98a0b3;
+      --panel: rgba(16, 21, 34, .9);
+      --panel-strong: #121827;
+      --line: rgba(255,255,255,.13);
+      --red: #ff3158;
+      --red-dark: #b90835;
+      --cyan: #28d7f5;
+      --gold: #ffc94a;
+      --green: #40e097;
+      --shadow: 0 24px 80px rgba(0,0,0,.36);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 20% 0%, rgba(255,49,88,.12), transparent 32rem),
+        radial-gradient(circle at 90% 35%, rgba(40,215,245,.08), transparent 28rem),
+        #070a12;
+      font-family: "Arial Narrow", "Yu Gothic", "Hiragino Kaku Gothic ProN", sans-serif;
+      line-height: 1.55;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; }
+    button, select { font: inherit; }
+    button { color: inherit; }
+
+    .hero {
+      position: relative;
+      min-height: 720px;
+      display: flex;
+      flex-direction: column;
+      isolation: isolate;
+      background-image:
+        linear-gradient(90deg, rgba(4,6,12,.96) 0%, rgba(4,6,12,.69) 47%, rgba(4,6,12,.4) 100%),
+        linear-gradient(0deg, #070a12 0%, transparent 40%),
+        url("assets/stadium-hero.png");
+      background-size: cover;
+      background-position: center;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      opacity: .22;
+      background-image: repeating-linear-gradient(115deg, transparent 0 28px, rgba(255,255,255,.08) 29px, transparent 30px);
+      mask-image: linear-gradient(to bottom, #000, transparent 72%);
+    }
+
+    .nav {
+      width: min(1380px, calc(100% - 40px));
+      margin: 0 auto;
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      border-bottom: 1px solid rgba(255,255,255,.19);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      white-space: nowrap;
+    }
+
+    .brand-ball {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      box-shadow: 0 0 25px rgba(255,255,255,.22);
+    }
+
+    .nav-links { display: flex; gap: 25px; }
+    .nav-links a {
+      color: rgba(255,255,255,.72);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-decoration: none;
+    }
+    .nav-links a:hover { color: #fff; }
+
+    .hero-inner {
+      width: min(1380px, calc(100% - 40px));
+      margin: auto;
+      padding: 76px 0 112px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, .65fr);
+      gap: 70px;
+      align-items: end;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 18px;
+      color: var(--cyan);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 42px;
+      height: 3px;
+      background: var(--red);
+      box-shadow: 0 0 12px var(--red);
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 900px;
+      font-family: Impact, "Arial Black", sans-serif;
+      font-size: clamp(68px, 10.5vw, 158px);
+      font-weight: 900;
+      line-height: .81;
+      letter-spacing: -.045em;
+      text-transform: uppercase;
+      text-shadow: 0 8px 32px rgba(0,0,0,.5);
+    }
+    h1 .outline { color: transparent; -webkit-text-stroke: 2px rgba(255,255,255,.85); }
+    h1 .accent { color: var(--red); filter: drop-shadow(0 0 20px rgba(255,49,88,.38)); }
+
+    .lead {
+      max-width: 720px;
+      margin: 28px 0 0;
+      color: rgba(255,255,255,.78);
+      font-size: clamp(15px, 1.4vw, 19px);
+      font-weight: 600;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 22px;
+      margin-top: 30px;
+    }
+    .hero-stat strong {
+      display: block;
+      color: var(--cyan);
+      font-family: Impact, sans-serif;
+      font-size: 26px;
+      line-height: 1;
+    }
+    .hero-stat span {
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: .13em;
+    }
+
+    .hero-card {
+      align-self: end;
+      padding: 24px;
+      background: rgba(8,11,20,.78);
+      border: 1px solid rgba(255,255,255,.19);
+      border-top: 4px solid var(--red);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .live-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .18em;
+    }
+    .live-label::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--red);
+      box-shadow: 0 0 0 7px rgba(255,49,88,.14);
+      animation: pulse 1.6s infinite;
+    }
+    @keyframes pulse { 50% { box-shadow: 0 0 0 12px rgba(255,49,88,0); } }
+
+    .next-date { color: var(--muted); font-size: 13px; font-weight: 800; }
+    .next-teams {
+      margin: 7px 0 18px;
+      font-size: 27px;
+      font-weight: 900;
+      letter-spacing: -.03em;
+    }
+    .countdown {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+    .countdown div { padding: 10px 4px 8px; text-align: center; background: rgba(255,255,255,.07); }
+    .countdown strong { display: block; font-size: 22px; line-height: 1; }
+    .countdown span { color: var(--muted); font-size: 9px; font-weight: 900; letter-spacing: .1em; }
+
+    .data-bar {
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,.025);
+    }
+    .data-bar-inner {
+      width: min(1380px, calc(100% - 40px));
+      min-height: 46px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .data-status { display: flex; align-items: center; gap: 8px; }
+    .data-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 10px currentColor; }
+    .data-dot.ready { background: var(--green); }
+    .data-dot.error { background: var(--red); }
+    .retry {
+      padding: 4px 10px;
+      color: var(--ink);
+      background: transparent;
+      border: 1px solid var(--line);
+      cursor: pointer;
+    }
+    .retry:disabled { cursor: wait; opacity: .55; }
+
+    .section {
+      width: min(1380px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 90px 0;
+    }
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 30px;
+      margin-bottom: 36px;
+    }
+    .kicker {
+      margin: 0 0 6px;
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+    }
+    h2 {
+      margin: 0;
+      font-family: Impact, "Arial Black", sans-serif;
+      font-size: clamp(38px, 5vw, 68px);
+      line-height: 1;
+      letter-spacing: -.02em;
+    }
+    .section-note { max-width: 540px; margin: 0; color: var(--muted); font-size: 13px; }
+
+    .day-toolbar {
+      display: grid;
+      grid-template-columns: 44px minmax(220px, 1fr) 44px;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .day-button, .group-filter button {
+      min-height: 44px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--line);
+      cursor: pointer;
+    }
+    .day-button:hover, .group-filter button:hover { border-color: var(--cyan); }
+    .day-heading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      min-height: 44px;
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      font-weight: 900;
+    }
+    .day-count { color: var(--cyan); font-size: 12px; }
+
+    .today-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .match-card {
+      position: relative;
+      min-height: 260px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.06), transparent 45%),
+        var(--panel-strong);
+      border: 1px solid var(--line);
+      box-shadow: 0 14px 45px rgba(0,0,0,.22);
+    }
+    .match-card.japan { border-color: rgba(255,49,88,.56); }
+    .match-card.live { border-color: var(--green); box-shadow: 0 0 40px rgba(64,224,151,.08); }
+    .match-card::after {
+      content: attr(data-number);
+      position: absolute;
+      right: -3px;
+      top: 2px;
+      color: rgba(255,255,255,.025);
+      font-family: Impact, sans-serif;
+      font-size: 88px;
+      line-height: 1;
+    }
+    .match-meta, .match-team, .channels { position: relative; z-index: 1; }
+    .match-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 25px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+    .status-tag {
+      padding: 4px 8px;
+      color: var(--gold);
+      background: rgba(255,201,74,.1);
+      border-radius: 2px;
+    }
+    .status-tag.live { color: #07130e; background: var(--green); }
+    .status-tag.done { color: var(--ink); background: rgba(255,255,255,.1); }
+    .match-team {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 12px;
+      min-height: 42px;
+      font-size: 17px;
+      font-weight: 900;
+    }
+    .team-main { display: flex; align-items: center; min-width: 0; gap: 9px; }
+    .team-main span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .team-flag { width: 27px; text-align: center; font-size: 22px; }
+    .team-score { font-family: Impact, sans-serif; font-size: 25px; }
+    .match-team.winner .team-score { color: var(--green); }
+    .match-team.winner .team-main { color: #fff; }
+    .match-team.loser { color: #9ca3b5; }
+    .channels {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: auto;
+      padding-top: 17px;
+      border-top: 1px solid var(--line);
+    }
+    .channel {
+      display: inline-grid;
+      gap: 1px;
+      min-height: 34px;
+      padding: 5px 8px;
+      color: #fff;
+      background: rgba(255,255,255,.1);
+      border-radius: 2px;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: .05em;
+    }
+    .channel small { color: rgba(255,255,255,.72); font-size: 8px; letter-spacing: 0; }
+    .channel.stream { color: #05070b; background: var(--green); }
+    .channel.stream small { color: rgba(5,7,11,.7); }
+    .channel.tv { background: var(--red-dark); }
+    .channel.recorded { background: #394157; }
+    .channel.pending { color: var(--ink); background: rgba(255,255,255,.1); }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      padding: 42px;
+      color: var(--muted);
+      text-align: center;
+      background: rgba(255,255,255,.025);
+      border: 1px dashed var(--line);
+    }
+
+    .japan-strip {
+      padding-top: 0;
+    }
+    .japan-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .groups-section {
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(rgba(7,10,18,.96), rgba(7,10,18,.96)),
+        repeating-linear-gradient(90deg, transparent 0 70px, rgba(255,255,255,.04) 71px);
+    }
+    .group-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 22px;
+    }
+    .group-filter button {
+      min-width: 44px;
+      min-height: 36px;
+      padding: 0 12px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .group-filter button.active { color: #071018; background: var(--cyan); border-color: var(--cyan); }
+    .groups-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .group-card {
+      padding: 22px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: 0 18px 50px rgba(0,0,0,.18);
+    }
+    .group-card.hidden { display: none; }
+    .group-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      font-family: Impact, sans-serif;
+      font-size: 25px;
+      letter-spacing: .05em;
+    }
+    .group-title span:last-child { color: var(--muted); font-family: Arial, sans-serif; font-size: 10px; }
+    .standings {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+    .standings th {
+      padding: 6px 4px;
+      color: var(--muted);
+      font-size: 9px;
+      text-align: center;
+      border-bottom: 1px solid var(--line);
+    }
+    .standings th:nth-child(2) { text-align: left; }
+    .standings td { padding: 8px 4px; text-align: center; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .standings td:nth-child(2) { text-align: left; font-weight: 800; }
+    .standings tr.qualify td:first-child { color: var(--green); }
+    .standing-team { display: flex; align-items: center; gap: 7px; }
+    .standing-team .team-flag { width: 20px; font-size: 16px; }
+    .standing-points { color: var(--cyan); font-weight: 900; }
+    .group-fixtures { margin-top: 14px; }
+    .fixture-row {
+      display: grid;
+      grid-template-columns: 78px minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      font-size: 10px;
+    }
+    .fixture-date { color: var(--muted); font-weight: 800; }
+    .fixture-team { overflow: hidden; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+    .fixture-team.home { text-align: right; }
+    .fixture-score {
+      min-width: 44px;
+      color: var(--gold);
+      font-family: Impact, sans-serif;
+      font-size: 14px;
+      text-align: center;
+    }
+    .fixture-channels {
+      grid-column: 2 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding-bottom: 4px;
+    }
+    .fixture-channel {
+      padding: 2px 5px;
+      color: #fff;
+      background: var(--red-dark);
+      border-radius: 2px;
+      font-size: 8px;
+      font-weight: 900;
+      letter-spacing: .03em;
+    }
+    .fixture-channel.stream { color: #05070b; background: var(--green); }
+    .fixture-channel.recorded { background: #394157; }
+    .fixture-channel.pending { color: var(--ink); background: rgba(255,255,255,.1); }
+
+    .bracket-section { padding: 88px 0 105px; }
+    .bracket-wrap {
+      overflow-x: auto;
+      padding: 4px max(20px, calc((100vw - 1380px)/2)) 28px;
+      scrollbar-color: var(--red) rgba(255,255,255,.08);
+    }
+    .bracket {
+      width: 1680px;
+      min-height: 1780px;
+      display: grid;
+      grid-template-columns: repeat(5, 300px);
+      gap: 44px;
+    }
+    .round { min-width: 0; display: flex; flex-direction: column; }
+    .round-title {
+      height: 58px;
+      flex: 0 0 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px;
+      border-bottom: 2px solid rgba(255,255,255,.2);
+      font-family: Impact, sans-serif;
+      font-size: 22px;
+      letter-spacing: .04em;
+    }
+    .round-title small { color: var(--muted); font-family: Arial, sans-serif; font-size: 9px; letter-spacing: .08em; }
+    .round-list {
+      min-height: 0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      gap: 7px;
+      padding: 10px 0;
+    }
+    .bracket-match {
+      position: relative;
+      min-height: 112px;
+      padding: 10px 12px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      box-shadow: 0 10px 28px rgba(0,0,0,.2);
+    }
+    .round:not(:last-child) .bracket-match::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -45px;
+      width: 44px;
+      height: 1px;
+      background: rgba(255,255,255,.2);
+    }
+    .bm-meta {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 900;
+    }
+    .bm-team {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .bm-team + .bm-team { margin-top: 3px; }
+    .bm-team.winner { color: var(--green); }
+    .bm-channels { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+    .bm-channel {
+      padding: 2px 5px;
+      color: #fff;
+      background: var(--red-dark);
+      border-radius: 2px;
+      font-size: 8px;
+      font-weight: 900;
+    }
+    .bm-channel.stream { color: #05070b; background: var(--green); }
+    .bm-channel.recorded { background: #394157; }
+    .bm-channel.pending { color: var(--ink); background: rgba(255,255,255,.1); }
+    .final-round .bracket-match {
+      min-height: 132px;
+      padding: 18px;
+      border-left-color: var(--gold);
+      background:
+        radial-gradient(circle at 80% 0%, rgba(255,201,74,.18), transparent 45%),
+        var(--panel-strong);
+    }
+    .final-round .bm-team { font-size: 15px; }
+    .third-place { border-left-color: var(--red); }
+
+    .info-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+    }
+    .info-item { min-height: 160px; padding: 28px; background: #0b0f19; }
+    .info-item strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--cyan);
+      font-family: Impact, sans-serif;
+      font-size: 30px;
+    }
+    .info-item span { color: var(--muted); font-size: 13px; }
+    .broadcast-pending {
+      width: min(1380px, calc(100% - 40px));
+      margin: 24px auto 0;
+      padding: 16px 18px;
+      color: var(--muted);
+      background: rgba(255,201,74,.06);
+      border: 1px solid rgba(255,201,74,.25);
+      font-size: 11px;
+      line-height: 1.7;
+    }
+    .broadcast-pending strong { color: var(--gold); }
+
+    footer { padding: 30px 20px 50px; color: #7c8497; text-align: center; font-size: 11px; }
+    footer a { color: #bfc5d2; }
+
+    @media (max-width: 1050px) {
+      .today-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .groups-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 900px) {
+      .hero { min-height: 780px; }
+      .hero-inner { grid-template-columns: 1fr; gap: 34px; padding-top: 70px; }
+      .hero-card { max-width: 460px; }
+      .section-head { align-items: start; flex-direction: column; }
+      .japan-grid, .info-strip { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+    }
+    @media (max-width: 620px) {
+      .nav, .hero-inner, .section, .data-bar-inner { width: min(100% - 28px, 1380px); }
+      .nav { min-height: 66px; }
+      h1 { font-size: 62px; }
+      .hero { min-height: 740px; }
+      .hero-inner { padding-bottom: 82px; }
+      .hero-stats { gap: 15px; }
+      .section { padding: 68px 0; }
+      .today-grid { grid-template-columns: 1fr; }
+      .data-bar-inner { align-items: flex-start; flex-direction: column; padding: 10px 0; gap: 3px; }
+      .day-heading { font-size: 13px; }
+      .group-card { padding: 15px; }
+      .fixture-row { grid-template-columns: 70px minmax(0, 1fr) auto minmax(0, 1fr); gap: 5px; }
+      .channel { max-width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { scroll-behavior: auto !important; }
+      .live-label::before { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <nav class="nav" aria-label="メインナビゲーション">
+      <div class="brand"><span class="brand-ball">◆</span> WC26 MATCH CENTER</div>
+      <div class="nav-links">
+        <a href="#today">今日の試合</a>
+        <a href="#japan">日本代表</a>
+        <a href="#groups">予選リーグ</a>
+        <a href="#bracket">決勝トーナメント</a>
+        <a href="#watch">視聴方法</a>
+      </div>
+    </nav>
+
+    <div class="hero-inner">
+      <div>
+        <p class="eyebrow">FIFA WORLD CUP 26 / ALL 104 MATCHES</p>
+        <h1>ONE<br><span class="outline">WORLD.</span><br><span class="accent">ONE GOAL.</span></h1>
+        <p class="lead">予選リーグから決勝まで、全試合を日本時間で。今日観られるカード、放送先、最新結果と勝ち上がりをひとつの画面で追いかけよう。</p>
+        <div class="hero-stats">
+          <div class="hero-stat"><strong>48</strong><span>NATIONS</span></div>
+          <div class="hero-stat"><strong>104</strong><span>MATCHES</span></div>
+          <div class="hero-stat"><strong>12</strong><span>GROUPS</span></div>
+          <div class="hero-stat"><strong>1</strong><span>CHAMPION</span></div>
+        </div>
+      </div>
+
+      <aside class="hero-card" aria-label="次の日本代表戦">
+        <div class="live-label" id="hero-label">NEXT JAPAN MATCH</div>
+        <div class="next-date" id="next-date">最新日程を読み込んでいます</div>
+        <div class="next-teams" id="next-teams">日本代表の次戦</div>
+        <div class="countdown" id="countdown">
+          <div><strong>--</strong><span>DAYS</span></div>
+          <div><strong>--</strong><span>HOURS</span></div>
+          <div><strong>--</strong><span>MIN</span></div>
+          <div><strong>--</strong><span>SEC</span></div>
+        </div>
+      </aside>
+    </div>
+  </header>
+
+  <div class="data-bar">
+    <div class="data-bar-inner">
+      <div class="data-status"><span class="data-dot" id="data-dot"></span><span id="data-status">ローカルデータを読み込んでいます</span></div>
+      <div><span id="updated-at">JST</span> <button class="retry" id="retry-button" type="button">最新結果を確認</button></div>
+    </div>
+  </div>
+
+  <main>
+    <section class="section" id="today">
+      <div class="section-head">
+        <div>
+          <p class="kicker">TODAY'S MATCHES / JST</p>
+          <h2>今日、観られる試合。</h2>
+        </div>
+        <p class="section-note">日付は日本時間です。左右のボタンで大会期間中の各日に移動できます。確認済みの試合はスコアと勝者を表示します。</p>
+      </div>
+      <div class="day-toolbar">
+        <button class="day-button" id="previous-day" type="button" aria-label="前日">‹</button>
+        <div class="day-heading"><span id="selected-day-label">本日</span><span class="day-count" id="selected-day-count">--試合</span></div>
+        <button class="day-button" id="next-day" type="button" aria-label="翌日">›</button>
+      </div>
+      <div class="today-grid" id="today-grid">
+        <div class="empty-state">試合データを読み込んでいます。</div>
+      </div>
+    </section>
+
+    <section class="section japan-strip" id="japan">
+      <div class="section-head">
+        <div>
+          <p class="kicker">SAMURAI BLUE / GROUP F</p>
+          <h2>日本代表、3つの決戦。</h2>
+        </div>
+        <p class="section-note">グループFの日本戦を抜き出して表示しています。日時はすべて日本時間。試合後は結果表示へ切り替わります。</p>
+      </div>
+      <div class="japan-grid" id="japan-grid">
+        <div class="empty-state">日本代表の日程を読み込んでいます。</div>
+      </div>
+    </section>
+
+    <section class="groups-section" id="groups">
+      <div class="section">
+        <div class="section-head">
+          <div>
+            <p class="kicker">GROUP STAGE / 72 MATCHES</p>
+            <h2>全12グループ。</h2>
+          </div>
+          <p class="section-note">順位表と全72試合をグループごとに掲載。保存されている試合結果から勝点・得失点差・順位をページ内で計算します。</p>
+        </div>
+        <div class="group-filter" id="group-filter" aria-label="グループ絞り込み"></div>
+        <div class="groups-grid" id="groups-grid">
+          <div class="empty-state">グループ情報を読み込んでいます。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bracket-section" id="bracket">
+      <div class="section section-head" style="padding-top:0;padding-bottom:0">
+        <div>
+          <p class="kicker">THE ROAD TO NEW YORK NEW JERSEY</p>
+          <h2>決勝トーナメント。</h2>
+        </div>
+        <p class="section-note">横にスクロールして決勝まで追えます。進出国が確定するとプレースホルダーが国名へ替わり、試合後は勝者が強調表示されます。</p>
+      </div>
+      <div class="broadcast-pending" id="broadcast-pending"></div>
+      <div class="bracket-wrap" aria-label="決勝トーナメント表">
+        <div class="bracket" id="bracket-grid">
+          <div class="empty-state">トーナメントを読み込んでいます。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="watch">
+      <div class="section-head">
+        <div>
+          <p class="kicker">HOW TO WATCH IN JAPAN</p>
+          <h2>日本で観る。</h2>
+        </div>
+      </div>
+      <div class="info-strip">
+        <div class="info-item"><strong>テレビ生中継</strong><span>NHK総合、日本テレビ系、フジテレビ系、NHK BSの発表済みカードを表示。「生」の時刻は番組開始時刻です。</span></div>
+        <div class="info-item"><strong>BSプレミアム4K</strong><span>全104試合を生中継または録画放送。「録画」の時刻はキックオフではなく、テレビ放送が始まる時刻です。</span></div>
+        <div class="info-item"><strong>DAZN</strong><span>全104試合をキックオフからライブ配信。日本代表戦は無料配信予定です。</span></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>有料API・アカウント登録なし / ページ表示時に1回だけ結果確認 / 日時は日本時間（JST）</p>
+    <p>
+      出典:
+      <a href="https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/match-schedule-fixtures-results-teams-stadiums" target="_blank" rel="noreferrer">FIFA Match Schedule</a> /
+      <a href="https://www.nhk.jp/g/fifaworldcup/blog/2690mdowz/" target="_blank" rel="noreferrer">NHK公式日程</a> /
+      <a href="https://www.ntv.co.jp/FIFAworldcup2026/oa/" target="_blank" rel="noreferrer">日本テレビ公式日程</a> /
+      <a href="https://www.fujitv.co.jp/sports/soccer/FIFAworldcup/index.html" target="_blank" rel="noreferrer">フジテレビ公式日程</a> /
+      <a href="https://www.jfa.jp/samuraiblue/worldcup_2026/tv.html" target="_blank" rel="noreferrer">JFA放送情報</a> /
+      <a href="https://en.wikipedia.org/wiki/2026_FIFA_World_Cup" target="_blank" rel="noreferrer">Wikipedia（CC BY-SA 4.0）</a>
+    </p>
+    <p>放送情報確認日: 2026年6月14日。非公式ファン制作ページです。Wikipediaは速報元のため、結果の反映が遅れたり後から訂正されたりする場合があります。未発表の放送カードは推測で表示していません。視聴前に各放送局の番組表もご確認ください。</p>
+  </footer>
+
+  <script src="match-data.js"></script>
+  <script src="live-results.js"></script>
+  <script src="broadcast-data.js"></script>
+  <script>
+    const JST = "Asia/Tokyo";
+
+    const TEAM_META = {
+      MEX:["メキシコ","🇲🇽"], CZE:["チェコ","🇨🇿"], KOR:["韓国","🇰🇷"], RSA:["南アフリカ","🇿🇦"],
+      CAN:["カナダ","🇨🇦"], BIH:["ボスニア・ヘルツェゴビナ","🇧🇦"], SUI:["スイス","🇨🇭"], QAT:["カタール","🇶🇦"],
+      BRA:["ブラジル","🇧🇷"], SCO:["スコットランド","🏴"], HAI:["ハイチ","🇭🇹"], MAR:["モロッコ","🇲🇦"],
+      PAR:["パラグアイ","🇵🇾"], TUR:["トルコ","🇹🇷"], AUS:["オーストラリア","🇦🇺"], USA:["アメリカ","🇺🇸"],
+      ECU:["エクアドル","🇪🇨"], GER:["ドイツ","🇩🇪"], CIV:["コートジボワール","🇨🇮"], CUW:["キュラソー","🇨🇼"],
+      NED:["オランダ","🇳🇱"], SWE:["スウェーデン","🇸🇪"], JPN:["日本","🇯🇵"], TUN:["チュニジア","🇹🇳"],
+      BEL:["ベルギー","🇧🇪"], IRN:["イラン","🇮🇷"], EGY:["エジプト","🇪🇬"], NZL:["ニュージーランド","🇳🇿"],
+      ESP:["スペイン","🇪🇸"], URU:["ウルグアイ","🇺🇾"], KSA:["サウジアラビア","🇸🇦"], CPV:["カーボベルデ","🇨🇻"],
+      NOR:["ノルウェー","🇳🇴"], FRA:["フランス","🇫🇷"], SEN:["セネガル","🇸🇳"], IRQ:["イラク","🇮🇶"],
+      ARG:["アルゼンチン","🇦🇷"], AUT:["オーストリア","🇦🇹"], ALG:["アルジェリア","🇩🇿"], JOR:["ヨルダン","🇯🇴"],
+      COL:["コロンビア","🇨🇴"], POR:["ポルトガル","🇵🇹"], UZB:["ウズベキスタン","🇺🇿"], COD:["コンゴ民主共和国","🇨🇩"],
+      ENG:["イングランド","🏴"], CRO:["クロアチア","🇭🇷"], PAN:["パナマ","🇵🇦"], GHA:["ガーナ","🇬🇭"]
+    };
+
+    const ROUND_META = [
+      { slug:"round-of-32", title:"ROUND OF 32", sub:"6.29 - 7.4 JST" },
+      { slug:"round-of-16", title:"ROUND OF 16", sub:"7.5 - 7.8 JST" },
+      { slug:"quarterfinals", title:"QUARTERFINALS", sub:"7.10 - 7.12 JST" },
+      { slug:"semifinals", title:"SEMIFINALS", sub:"7.15 - 7.16 JST" },
+      { slug:"final", title:"FINAL", sub:"7.20 JST", final:true }
+    ];
+
+    const BASELINE_SNAPSHOT = window.WC26_DATA;
+    const BROADCAST_DATA = window.WC26_BROADCAST;
+    const initialSnapshot = window.WC26_LIVE.getInitialSnapshot(BASELINE_SNAPSHOT);
+    let currentSnapshot = initialSnapshot;
+    let events = [...(initialSnapshot.events || [])].sort((a, b) => a.number - b.number);
+    let groups = buildGroups(events);
+    let selectedDay = dateKey(new Date());
+    let activeGroup = "ALL";
+    let nextJapanEvent = null;
+    let refreshInProgress = false;
+
+    const $ = id => document.getElementById(id);
+
+    function buildGroups(allEvents) {
+      return [..."ABCDEFGHIJKL"].map(letter => {
+        const fixtures = allEvents.filter(event => event.slug === "group-stage" && event.group === letter);
+        const table = new Map();
+        fixtures.flatMap(event => event.competitors).forEach(team => {
+          if (!table.has(team.abbreviation)) {
+            table.set(team.abbreviation, {
+              abbreviation: team.abbreviation,
+              displayName: team.displayName,
+              played: 0, wins: 0, draws: 0, losses: 0,
+              goalsFor: 0, goalsAgainst: 0, points: 0
+            });
+          }
+        });
+
+        fixtures.filter(event => event.status.completed).forEach(event => {
+          const home = homeOf(event);
+          const away = awayOf(event);
+          const homeRow = table.get(home.abbreviation);
+          const awayRow = table.get(away.abbreviation);
+          const homeScore = Number(home.score);
+          const awayScore = Number(away.score);
+          homeRow.played += 1;
+          awayRow.played += 1;
+          homeRow.goalsFor += homeScore;
+          homeRow.goalsAgainst += awayScore;
+          awayRow.goalsFor += awayScore;
+          awayRow.goalsAgainst += homeScore;
+          if (homeScore === awayScore) {
+            homeRow.draws += 1;
+            awayRow.draws += 1;
+            homeRow.points += 1;
+            awayRow.points += 1;
+          } else if (homeScore > awayScore) {
+            homeRow.wins += 1;
+            awayRow.losses += 1;
+            homeRow.points += 3;
+          } else {
+            awayRow.wins += 1;
+            homeRow.losses += 1;
+            awayRow.points += 3;
+          }
+        });
+
+        const entries = [...table.values()]
+          .sort((a, b) =>
+            b.points - a.points ||
+            (b.goalsFor - b.goalsAgainst) - (a.goalsFor - a.goalsAgainst) ||
+            b.goalsFor - a.goalsFor ||
+            a.displayName.localeCompare(b.displayName)
+          )
+          .map((entry, index) => ({
+            abbreviation: entry.abbreviation,
+            displayName: entry.displayName,
+            stats: {
+              rank: String(index + 1),
+              gamesPlayed: String(entry.played),
+              wins: String(entry.wins),
+              ties: String(entry.draws),
+              losses: String(entry.losses),
+              pointDifferential: `${entry.goalsFor - entry.goalsAgainst > 0 ? "+" : ""}${entry.goalsFor - entry.goalsAgainst}`,
+              points: String(entry.points)
+            }
+          }));
+        return { name: `Group ${letter}`, entries };
+      });
+    }
+
+    function resolveKnownParticipants() {
+      const byNumber = new Map(events.map(event => [Number(event.number), event]));
+      const groupRanks = new Map(groups.flatMap(group => {
+        const letter = group.name.slice(-1);
+        const completed = events.filter(event =>
+          event.slug === "group-stage" && event.group === letter && event.status.completed
+        ).length;
+        return completed === 6
+          ? group.entries.map((entry, index) => [`${letter}-${index + 1}`, entry])
+          : [];
+      }));
+      const copyIdentity = (target, source) => {
+        target.abbreviation = source.abbreviation;
+        target.displayName = source.displayName;
+      };
+
+      events.filter(event => event.slug !== "group-stage").forEach(event => {
+        event.competitors.forEach(team => {
+          let match = team.displayName.match(/^(Winner|Loser) Match (\d+)$/i);
+          if (match) {
+            const source = byNumber.get(Number(match[2]));
+            if (!source?.status.completed) return;
+            const wantedWinner = match[1].toLowerCase() === "winner";
+            const resolved = source.competitors.find(item => wantedWinner ? item.winner : !item.winner);
+            if (resolved) copyIdentity(team, resolved);
+            return;
+          }
+          match = team.displayName.match(/^(Winner|Runner-up) Group ([A-L])$/i);
+          if (match) {
+            const rank = match[1].toLowerCase() === "winner" ? 1 : 2;
+            const resolved = groupRanks.get(`${match[2]}-${rank}`);
+            if (resolved) copyIdentity(team, resolved);
+          }
+        });
+      });
+    }
+
+    function loadData() {
+      const dot = $("data-dot");
+      if (events.length === 104) {
+        groups = buildGroups(events);
+        resolveKnownParticipants();
+        renderAll();
+        dot.className = initialSnapshot.sourceState === "cache" ? "data-dot ready" : "data-dot";
+        $("data-status").textContent = initialSnapshot.sourceState === "cache"
+          ? "前回確認した正常データを表示中"
+          : "保存済みデータを表示中";
+        $("updated-at").textContent = `データ確認 ${formatTime(new Date(initialSnapshot.updatedAt))}`;
+      } else {
+        dot.className = "data-dot error";
+        $("data-status").textContent = "ローカル試合データを読み込めませんでした";
+        $("updated-at").textContent = "match-data.jsをご確認ください";
+      }
+    }
+
+    async function refreshResults() {
+      if (refreshInProgress) return;
+      refreshInProgress = true;
+      const button = $("retry-button");
+      button.disabled = true;
+      button.textContent = "確認中";
+      $("data-dot").className = "data-dot";
+      $("data-status").textContent = "Wikipediaで最新結果を確認中";
+
+      try {
+        const snapshot = await window.WC26_LIVE.refresh(BASELINE_SNAPSHOT, currentSnapshot);
+        currentSnapshot = snapshot;
+        events = [...snapshot.events].sort((a, b) => a.number - b.number);
+        groups = buildGroups(events);
+        resolveKnownParticipants();
+        renderAll();
+        $("data-dot").className = "data-dot ready";
+        $("data-status").textContent = "最新結果を反映しました";
+        $("updated-at").textContent = `確認 ${formatTime(new Date(snapshot.updatedAt))}`;
+      } catch (error) {
+        $("data-dot").className = "data-dot error";
+        $("data-status").textContent = "確認できないため前回の正常データを表示中";
+        $("updated-at").textContent = `表示データ ${formatTime(new Date(currentSnapshot.updatedAt))}`;
+        console.warn("Result update skipped:", error);
+      } finally {
+        refreshInProgress = false;
+        button.disabled = false;
+        button.textContent = "最新結果を確認";
+      }
+    }
+
+    function dateParts(date) {
+      return Object.fromEntries(new Intl.DateTimeFormat("en-CA", {
+        timeZone: JST, year: "numeric", month: "2-digit", day: "2-digit"
+      }).formatToParts(date).filter(part => part.type !== "literal").map(part => [part.type, part.value]));
+    }
+
+    function dateKey(date) {
+      const parts = dateParts(date);
+      return `${parts.year}-${parts.month}-${parts.day}`;
+    }
+
+    function shiftDateKey(key, amount) {
+      const date = new Date(`${key}T00:00:00Z`);
+      date.setUTCDate(date.getUTCDate() + amount);
+      return date.toISOString().slice(0, 10);
+    }
+
+    function formatDateTime(date) {
+      return new Intl.DateTimeFormat("ja-JP", {
+        timeZone: JST, month: "numeric", day: "numeric", weekday: "short",
+        hour: "2-digit", minute: "2-digit", hourCycle: "h23"
+      }).format(date);
+    }
+
+    function formatTime(date) {
+      return new Intl.DateTimeFormat("ja-JP", {
+        timeZone: JST, month: "numeric", day: "numeric",
+        hour: "2-digit", minute: "2-digit", hourCycle: "h23"
+      }).format(date);
+    }
+
+    function formatDayLabel(key) {
+      const [year, month, day] = key.split("-").map(Number);
+      const date = new Date(Date.UTC(year, month - 1, day, 12));
+      const label = new Intl.DateTimeFormat("ja-JP", {
+        timeZone: JST, month: "long", day: "numeric", weekday: "long"
+      }).format(date);
+      return key === dateKey(new Date()) ? `今日・${label}` : label;
+    }
+
+    function teamMeta(competitor) {
+      const known = TEAM_META[competitor.abbreviation];
+      return {
+        name: known ? known[0] : localizePlaceholder(competitor.displayName),
+        flag: known ? known[1] : "◇"
+      };
+    }
+
+    function localizePlaceholder(name) {
+      const winnerGroup = name.match(/^Winner Group ([A-L])$/i);
+      if (winnerGroup) return `グループ${winnerGroup[1]} 1位`;
+      const runnerGroup = name.match(/^Runner-up Group ([A-L])$/i);
+      if (runnerGroup) return `グループ${runnerGroup[1]} 2位`;
+      const thirdGroups = name.match(/^3rd Group (.+)$/i);
+      if (thirdGroups) return `グループ${thirdGroups[1]} 3位通過国`;
+      const matchResult = name.match(/^(Winner|Loser) Match (\d+)$/i);
+      if (matchResult) return `M${matchResult[2]} ${matchResult[1].toLowerCase() === "winner" ? "勝者" : "敗者"}`;
+      const group = name.match(/Group ([A-L]) (1st|2nd|3rd) Place/i);
+      if (group) {
+        const rank = { "1st":"1位", "2nd":"2位", "3rd":"3位" }[group[2]];
+        return `グループ${group[1]} ${rank}`;
+      }
+      const round32 = name.match(/Round of 32 (\d+) Winner/i);
+      if (round32) return `R32 第${round32[1]}試合 勝者`;
+      const round16 = name.match(/Round of 16 (\d+) Winner/i);
+      if (round16) return `R16 第${round16[1]}試合 勝者`;
+      const quarter = name.match(/Quarterfinal (\d+) Winner/i);
+      if (quarter) return `準々決勝${quarter[1]} 勝者`;
+      const semifinal = name.match(/Semifinal (\d+) (Winner|Loser)/i);
+      if (semifinal) return `準決勝${semifinal[1]} ${semifinal[2] === "Winner" ? "勝者" : "敗者"}`;
+      return name;
+    }
+
+    function homeOf(event) {
+      return event.competitors.find(team => team.homeAway === "home") || event.competitors[0];
+    }
+
+    function awayOf(event) {
+      return event.competitors.find(team => team.homeAway === "away") || event.competitors[1];
+    }
+
+    function hasTeam(event, abbreviation) {
+      return event.competitors.some(team => team.abbreviation === abbreviation);
+    }
+
+    function eventNumber(event) {
+      return Number(event.number);
+    }
+
+    function statusInfo(event) {
+      if (event.status.state === "in") return { label: event.status.detail || "LIVE", className: "live" };
+      if (event.status.completed) return { label: event.status.detail || "試合終了", className: "done" };
+      if (new Date(event.date) <= new Date()) return { label: "結果確認中", className: "" };
+      return { label: "開始前", className: "" };
+    }
+
+    function broadcastsFor(event) {
+      const records = (BROADCAST_DATA.byMatch[eventNumber(event)] || []).map(record => ({ ...record }));
+
+      if (hasTeam(event, "JPN") && event.slug === "round-of-32") {
+        records.push(
+          { broadcaster:"フジテレビ系", medium:"tv", mode:"live", start:null, confirmed:true, note:"日本進出時・開始時刻未発表" },
+          { broadcaster:"NHK BS", medium:"tv", mode:"live", start:null, confirmed:true, note:"日本進出時・開始時刻未発表" }
+        );
+      }
+      if (hasTeam(event, "JPN") && ["round-of-16", "quarterfinals", "semifinals"].includes(event.slug)) {
+        records.push({
+          broadcaster:"NHK総合", medium:"tv", mode:"live", start:null,
+          confirmed:true, note:"日本進出時・開始時刻未発表"
+        });
+      }
+
+      records.forEach(record => {
+        if (record.broadcaster === "DAZN" && hasTeam(event, "JPN")) {
+          record.broadcaster = "DAZN 無料";
+        }
+      });
+
+      const priority = {
+        "NHK総合": 1, "日本テレビ系": 2, "フジテレビ系": 3, "NHK BS": 4,
+        "NHK BSプレミアム4K": 5, "DAZN": 6, "DAZN 無料": 6
+      };
+      return records
+        .filter((record, index, all) =>
+          all.findIndex(item => item.broadcaster === record.broadcaster && item.mode === record.mode) === index
+        )
+        .sort((a, b) => (priority[a.broadcaster] || 99) - (priority[b.broadcaster] || 99));
+    }
+
+    function broadcastName(record, compact = false) {
+      if (compact && record.broadcaster === "NHK BSプレミアム4K") return "BSP4K";
+      return record.broadcaster;
+    }
+
+    function broadcastStart(record, event) {
+      if (!record.start) return "";
+      const start = new Date(record.start);
+      const time = new Intl.DateTimeFormat("ja-JP", {
+        timeZone: JST, hour: "2-digit", minute: "2-digit", hourCycle: "h23"
+      }).format(start);
+      if (dateKey(start) === dateKey(new Date(event.date))) return time;
+      const day = new Intl.DateTimeFormat("ja-JP", {
+        timeZone: JST, month: "numeric", day: "numeric"
+      }).format(start);
+      return `${day} ${time}`;
+    }
+
+    function broadcastDetail(record, event) {
+      const start = broadcastStart(record, event);
+      if (record.mode === "recorded") return `録画${start ? ` ${start}` : ""}`;
+      if (record.mode === "scheduled") return record.note || "放送予定";
+      if (record.medium === "stream") return "ライブ";
+      return `生${start ? ` ${start}` : " 時刻未発表"}`;
+    }
+
+    function broadcastClass(record) {
+      if (!record.confirmed || record.mode === "scheduled") return "pending";
+      return record.mode === "recorded" ? "recorded" : record.medium;
+    }
+
+    function broadcastPill(record, event) {
+      return `<span class="channel ${broadcastClass(record)}">
+        <strong>${broadcastName(record)}</strong>
+        <small>${broadcastDetail(record, event)}</small>
+      </span>`;
+    }
+
+    function compactBroadcastPill(record, event, className) {
+      return `<span class="${className} ${broadcastClass(record)}">${broadcastName(record, true)} ${broadcastDetail(record, event)}</span>`;
+    }
+
+    function teamRow(competitor, event, compact = false) {
+      const meta = teamMeta(competitor);
+      const scoreVisible = event.status.state === "in" || event.status.completed;
+      const penaltyScore = event.penalties
+        ? (competitor.homeAway === "home" ? event.penalties.home : event.penalties.away)
+        : null;
+      const displayedScore = scoreVisible
+        ? `${competitor.score}${penaltyScore !== null ? ` (${penaltyScore})` : ""}`
+        : "";
+      const resultClass = competitor.winner ? "winner" : (event.status.completed ? "loser" : "");
+      if (compact) {
+        return `<div class="bm-team ${resultClass}"><span>${meta.flag} ${meta.name}</span><b>${displayedScore}</b></div>`;
+      }
+      return `
+        <div class="match-team ${resultClass}">
+          <div class="team-main"><span class="team-flag">${meta.flag}</span><span>${meta.name}</span></div>
+          <span class="team-score">${displayedScore}</span>
+        </div>`;
+    }
+
+    function matchCard(event) {
+      const status = statusInfo(event);
+      const cardClasses = ["match-card"];
+      if (hasTeam(event, "JPN")) cardClasses.push("japan");
+      if (event.status.state === "in") cardClasses.push("live");
+      return `
+        <article class="${cardClasses.join(" ")}" data-number="${String(eventNumber(event)).padStart(2, "0")}">
+          <div class="match-meta">
+            <span>MATCH ${eventNumber(event)} / ${formatDateTime(new Date(event.date))}</span>
+            <span class="status-tag ${status.className}">${status.label}</span>
+          </div>
+          ${teamRow(homeOf(event), event)}
+          ${teamRow(awayOf(event), event)}
+          <div class="channels">
+            ${broadcastsFor(event).map(record => broadcastPill(record, event)).join("")}
+          </div>
+        </article>`;
+    }
+
+    function renderAll() {
+      renderToday();
+      renderJapan();
+      renderGroups();
+      renderBracket();
+      renderBroadcastNotice();
+      updateHero();
+    }
+
+    function renderToday() {
+      const matches = events
+        .filter(event => dateKey(new Date(event.date)) === selectedDay)
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+      $("selected-day-label").textContent = formatDayLabel(selectedDay);
+      $("selected-day-count").textContent = `${matches.length}試合`;
+      $("today-grid").innerHTML = matches.length
+        ? matches.map(matchCard).join("")
+        : `<div class="empty-state">この日に予定されている試合はありません。</div>`;
+    }
+
+    function renderJapan() {
+      const matches = events.filter(event => event.slug === "group-stage" && hasTeam(event, "JPN"));
+      $("japan-grid").innerHTML = matches.length
+        ? matches.map(matchCard).join("")
+        : `<div class="empty-state">日本代表の日程を取得できませんでした。</div>`;
+    }
+
+    function stat(entry, name, fallback = "0") {
+      return entry.stats[name] ?? fallback;
+    }
+
+    function renderGroups() {
+      $("group-filter").innerHTML = ["ALL", ..."ABCDEFGHIJKL"].map(letter => `
+        <button type="button" data-group="${letter}" class="${activeGroup === letter ? "active" : ""}">
+          ${letter === "ALL" ? "ALL" : letter}
+        </button>`).join("");
+
+      $("group-filter").querySelectorAll("button").forEach(button => {
+        button.addEventListener("click", () => {
+          activeGroup = button.dataset.group;
+          renderGroups();
+        });
+      });
+
+      $("groups-grid").innerHTML = groups.map(group => {
+        const letter = group.name.slice(-1);
+        const teamCodes = new Set(group.entries.map(entry => entry.abbreviation));
+        const fixtures = events
+          .filter(event =>
+            event.slug === "group-stage" &&
+            event.competitors.every(team => teamCodes.has(team.abbreviation))
+          )
+          .sort((a, b) => new Date(a.date) - new Date(b.date));
+        const hidden = activeGroup !== "ALL" && activeGroup !== letter;
+        return `
+          <article class="group-card ${hidden ? "hidden" : ""}" data-group="${letter}">
+            <div class="group-title"><span>GROUP ${letter}</span><span>6 MATCHES</span></div>
+            <table class="standings">
+              <thead><tr><th>#</th><th>TEAM</th><th>試</th><th>勝</th><th>分</th><th>敗</th><th>差</th><th>点</th></tr></thead>
+              <tbody>
+                ${group.entries.map((entry, index) => {
+                  const meta = TEAM_META[entry.abbreviation] || [entry.displayName, "◇"];
+                  return `<tr class="${index < 2 ? "qualify" : ""}">
+                    <td>${stat(entry, "rank", index + 1)}</td>
+                    <td><span class="standing-team"><span class="team-flag">${meta[1]}</span>${meta[0]}</span></td>
+                    <td>${stat(entry, "gamesPlayed")}</td><td>${stat(entry, "wins")}</td>
+                    <td>${stat(entry, "ties")}</td><td>${stat(entry, "losses")}</td>
+                    <td>${stat(entry, "pointDifferential")}</td><td class="standing-points">${stat(entry, "points")}</td>
+                  </tr>`;
+                }).join("")}
+              </tbody>
+            </table>
+            <div class="group-fixtures">
+              ${fixtures.map(event => {
+                const home = homeOf(event);
+                const away = awayOf(event);
+                const homeMeta = teamMeta(home);
+                const awayMeta = teamMeta(away);
+                const score = event.status.completed || event.status.state === "in"
+                  ? `${home.score} - ${away.score}${event.penalties ? ` (PK ${event.penalties.home}-${event.penalties.away})` : ""}`
+                  : "VS";
+                return `<div class="fixture-row">
+                  <span class="fixture-date">${formatDateTime(new Date(event.date))}</span>
+                  <span class="fixture-team home">${homeMeta.flag} ${homeMeta.name}</span>
+                  <span class="fixture-score">${score}</span>
+                  <span class="fixture-team">${awayMeta.flag} ${awayMeta.name}</span>
+                  <span class="fixture-channels">
+                    ${broadcastsFor(event).map(record => compactBroadcastPill(record, event, "fixture-channel")).join("")}
+                  </span>
+                </div>`;
+              }).join("")}
+            </div>
+          </article>`;
+      }).join("");
+    }
+
+    function renderBracket() {
+      const thirdPlace = events.find(event => event.slug === "3rd-place-match");
+      $("bracket-grid").innerHTML = ROUND_META.map(round => {
+        const matches = events.filter(event => event.slug === round.slug);
+        if (round.slug === "final" && thirdPlace) matches.unshift(thirdPlace);
+        return `
+          <section class="round ${round.final ? "final-round" : ""}">
+            <div class="round-title"><span>${round.title}</span><small>${round.sub}</small></div>
+            <div class="round-list">
+              ${matches.map(event => {
+                const isThird = event.slug === "3rd-place-match";
+                return `<article class="bracket-match ${isThird ? "third-place" : ""}">
+                  <div class="bm-meta">
+                    <span>${isThird ? "3RD PLACE" : `M${eventNumber(event)}`} / ${formatDateTime(new Date(event.date))}</span>
+                  </div>
+                  ${teamRow(homeOf(event), event, true)}
+                  ${teamRow(awayOf(event), event, true)}
+                  <div class="bm-channels">
+                    ${broadcastsFor(event).map(record => compactBroadcastPill(record, event, "bm-channel")).join("")}
+                  </div>
+                </article>`;
+              }).join("")}
+            </div>
+          </section>`;
+      }).join("");
+    }
+
+    function renderBroadcastNotice() {
+      $("broadcast-pending").innerHTML = `
+        <strong>決勝トーナメントの地上波未発表枠</strong><br>
+        ${BROADCAST_DATA.pending.map(item => `${item.broadcaster}: ${item.note}`).join("<br>")}
+      `;
+    }
+
+    function updateHero() {
+      const now = new Date();
+      nextJapanEvent = events.find(event =>
+        hasTeam(event, "JPN") &&
+        (event.status.state === "in" || new Date(event.date) > now)
+      );
+      if (!nextJapanEvent) {
+        $("hero-label").textContent = "SAMURAI BLUE";
+        $("next-date").textContent = "次の対戦カード確定を待っています";
+        $("next-teams").textContent = "日本代表";
+        $("countdown").innerHTML = "<div style='grid-column:1/-1'><strong>WC26</strong><span>THE ROAD CONTINUES</span></div>";
+        return;
+      }
+      const home = teamMeta(homeOf(nextJapanEvent));
+      const away = teamMeta(awayOf(nextJapanEvent));
+      $("hero-label").textContent = nextJapanEvent.status.state === "in" ? "JAPAN MATCH LIVE" : "NEXT JAPAN MATCH";
+      $("next-date").textContent = `${formatDateTime(new Date(nextJapanEvent.date))} KICK OFF`;
+      $("next-teams").innerHTML = `${home.flag} ${home.name} <span style="color:var(--red)">VS</span> ${away.name} ${away.flag}`;
+      updateCountdown();
+    }
+
+    function updateCountdown() {
+      if (!nextJapanEvent || nextJapanEvent.status.state === "in") {
+        if (nextJapanEvent?.status.state === "in") {
+          $("countdown").innerHTML = "<div style='grid-column:1/-1'><strong>LIVE</strong><span>NOW PLAYING</span></div>";
+        }
+        return;
+      }
+      const diff = new Date(nextJapanEvent.date) - new Date();
+      if (diff <= 0) return;
+      const values = [
+        Math.floor(diff / 86400000),
+        Math.floor(diff / 3600000) % 24,
+        Math.floor(diff / 60000) % 60,
+        Math.floor(diff / 1000) % 60
+      ];
+      const labels = ["DAYS", "HOURS", "MIN", "SEC"];
+      $("countdown").innerHTML = values.map((value, index) =>
+        `<div><strong>${String(value).padStart(2, "0")}</strong><span>${labels[index]}</span></div>`
+      ).join("");
+    }
+
+    $("previous-day").addEventListener("click", () => {
+      selectedDay = shiftDateKey(selectedDay, -1);
+      renderToday();
+    });
+    $("next-day").addEventListener("click", () => {
+      selectedDay = shiftDateKey(selectedDay, 1);
+      renderToday();
+    });
+    $("retry-button").addEventListener("click", refreshResults);
+
+    loadData();
+    refreshResults();
+    setInterval(updateCountdown, 1000);
+  </script>
+</body>
+</html>
