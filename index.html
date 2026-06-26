@@ -904,7 +904,7 @@
       <a href="https://www.jfa.jp/samuraiblue/worldcup_2026/tv.html" target="_blank" rel="noreferrer">JFA放送情報</a> /
       <a href="https://en.wikipedia.org/wiki/2026_FIFA_World_Cup" target="_blank" rel="noreferrer">Wikipedia（CC BY-SA 4.0）</a>
     </p>
-    <p>放送情報確認日: 2026年6月14日。非公式ファン制作ページです。Wikipediaは速報元のため、結果の反映が遅れたり後から訂正されたりする場合があります。未発表の放送カードは推測で表示していません。視聴前に各放送局の番組表もご確認ください。</p>
+    <p>放送情報確認日: 2026年6月26日。非公式ファン制作ページです。Wikipediaは速報元のため、結果の反映が遅れたり後から訂正されたりする場合があります。未発表の放送カードは推測で表示していません。視聴前に各放送局の番組表もご確認ください。</p>
   </footer>
 
   <script src="match-data.js"></script>
@@ -1140,8 +1140,13 @@
 
     function broadcastsFor(event) {
       const records = (BROADCAST_DATA.byMatch[eventNumber(event)] || []).map(record => ({ ...record }));
+      const projected = advancement?.byMatch?.[eventNumber(event)];
+      const japanProjected = projected && [projected.home, projected.away].some(slot =>
+        slot?.primary?.abbreviation === "JPN" || slot?.candidates?.some(team => team.abbreviation === "JPN")
+      );
+      const hasJapanPath = hasTeam(event, "JPN") || japanProjected;
 
-      if (hasTeam(event, "JPN") && event.slug === "round-of-32") {
+      if (hasJapanPath && event.slug === "round-of-32") {
         records.push(
           { broadcaster:"フジテレビ系", medium:"tv", mode:"live", start:null, confirmed:true, note:"日本進出時・開始時刻未発表" },
           { broadcaster:"NHK BS", medium:"tv", mode:"live", start:null, confirmed:true, note:"日本進出時・開始時刻未発表" }
@@ -1155,7 +1160,7 @@
       }
 
       records.forEach(record => {
-        if (record.broadcaster === "DAZN" && hasTeam(event, "JPN")) {
+        if (record.broadcaster === "DAZN" && hasJapanPath) {
           record.broadcaster = "DAZN 無料";
         }
       });

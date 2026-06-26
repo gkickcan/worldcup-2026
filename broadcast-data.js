@@ -1,4 +1,4 @@
-// Japan broadcast schedule verified against broadcaster-operated pages on 2026-06-14.
+// Japan broadcast schedule verified against broadcaster-operated pages on 2026-06-26.
 (function () {
   const byMatch = Object.fromEntries(
     Array.from({ length: 104 }, (_, index) => [index + 1, []])
@@ -95,7 +95,10 @@
     89:"2026-07-05T05:40:00+09:00", 93:"2026-07-07T03:40:00+09:00"
   };
   Object.entries(nipponTv).forEach(([match, start]) => {
-    add(Number(match), "日本テレビ系", "tv", "live", start);
+    add(Number(match), "日本テレビ系", "tv", "live", start, Number(match) === 89
+      ? { note: "進出チーム次第で変更可能性あり" }
+      : {}
+    );
   });
 
   const fujiTv = {
@@ -111,16 +114,16 @@
   add(104, "NHK総合", "tv", "live", null, { note: "放送開始時刻未発表" });
 
   window.WC26_BROADCAST = {
-    verifiedAt: "2026-06-14",
+    verifiedAt: "2026-06-26",
     byMatch,
     pending: [
       {
         broadcaster: "NHK総合", stage: "決勝トーナメント", count: 13,
-        confirmed: false, note: "決勝トーナメント13試合は、放送カード確定後に反映します。"
+        confirmed: false, note: "3位決定戦・決勝以外の決勝トーナメント地上波枠は、放送カード確定後に反映します。"
       },
       {
         broadcaster: "日本テレビ系", stage: "準決勝", count: 1,
-        confirmed: false, note: "準決勝1試合は、7月15日または16日のどちらになるか未発表です。"
+        confirmed: false, note: "準決勝1試合は、M101/M102のどちらになるか未発表です。"
       },
       {
         broadcaster: "フジテレビ系", stage: "決勝トーナメント", count: 5,
