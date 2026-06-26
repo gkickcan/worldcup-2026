@@ -936,6 +936,7 @@
       { slug:"semifinals", title:"SEMIFINALS", sub:"7.15 - 7.16 JST" },
       { slug:"final", title:"FINAL", sub:"7.20 JST", final:true }
     ];
+    const ROUND_32_BRACKET_ORDER = [74, 77, 73, 75, 76, 78, 79, 80, 83, 84, 81, 82, 86, 88, 85, 87];
 
     const BASELINE_SNAPSHOT = window.WC26_DATA;
     const BROADCAST_DATA = window.WC26_BROADCAST;
@@ -1462,7 +1463,10 @@
     function renderBracket() {
       const thirdPlace = events.find(event => event.slug === "3rd-place-match");
       $("bracket-grid").innerHTML = ROUND_META.map(round => {
-        const matches = events.filter(event => event.slug === round.slug);
+        const matches = events.filter(event => event.slug === round.slug).sort((a, b) => {
+          if (round.slug !== "round-of-32") return eventNumber(a) - eventNumber(b);
+          return ROUND_32_BRACKET_ORDER.indexOf(eventNumber(a)) - ROUND_32_BRACKET_ORDER.indexOf(eventNumber(b));
+        });
         if (round.slug === "final" && thirdPlace) matches.unshift(thirdPlace);
         return `
           <section class="round ${round.final ? "final-round" : ""}">
