@@ -407,21 +407,51 @@
       border: 1px dashed var(--line);
     }
 
-    .japan-strip {
-      padding-top: 0;
-    }
-    .japan-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-
     .groups-section {
       border-top: 1px solid var(--line);
       border-bottom: 1px solid var(--line);
       background:
         linear-gradient(rgba(7,10,18,.96), rgba(7,10,18,.96)),
         repeating-linear-gradient(90deg, transparent 0 70px, rgba(255,255,255,.04) 71px);
+    }
+    .groups-disclosure {
+      overflow: hidden;
+      background: rgba(255,255,255,.025);
+      border: 1px solid var(--line);
+    }
+    .groups-disclosure summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      min-height: 82px;
+      padding: 22px 26px;
+      cursor: pointer;
+      list-style: none;
+    }
+    .groups-disclosure summary::-webkit-details-marker { display: none; }
+    .groups-disclosure summary::after {
+      content: "開く";
+      flex: 0 0 auto;
+      padding: 10px 14px;
+      color: #071018;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      background: var(--cyan);
+      border-radius: 999px;
+    }
+    .groups-disclosure[open] summary::after { content: "閉じる"; }
+    .groups-disclosure-title strong {
+      display: block;
+      margin-bottom: 6px;
+      font-family: Impact, sans-serif;
+      font-size: clamp(30px, 5vw, 54px);
+      letter-spacing: .04em;
+    }
+    .groups-disclosure-title span { color: var(--muted); font-size: 13px; line-height: 1.8; }
+    .groups-panel {
+      padding: 0 26px 28px;
     }
     .group-filter {
       display: flex;
@@ -550,40 +580,6 @@
     .legend-chip.provisional, .slot-badge.provisional { color: #061116; background: var(--cyan); border-color: var(--cyan); }
     .legend-chip.possible, .slot-badge.possible { color: var(--muted); background: rgba(255,255,255,.05); }
     .slot-badge.qualified { color: var(--gold); border-color: rgba(255,201,74,.45); background: rgba(255,201,74,.08); }
-    .japan-routes {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-    .japan-route {
-      position: relative;
-      min-height: 230px;
-      padding: 22px;
-      overflow: hidden;
-      background:
-        radial-gradient(circle at 100% 0%, rgba(40,215,245,.12), transparent 46%),
-        var(--panel-strong);
-      border: 1px solid var(--line);
-      border-top: 3px solid var(--cyan);
-    }
-    .japan-route.active { border-color: rgba(255,49,88,.6); border-top-color: var(--red); }
-    .japan-route.inactive { opacity: .55; }
-    .route-kicker { color: var(--red); font-size: 10px; font-weight: 900; letter-spacing: .14em; }
-    .route-title { margin: 6px 0 12px; font-family: Impact, sans-serif; font-size: 27px; }
-    .route-meta { color: var(--muted); font-size: 10px; font-weight: 800; }
-    .route-opponent { margin: 14px 0 5px; font-size: 17px; font-weight: 900; }
-    .route-candidates { color: var(--muted); font-size: 10px; }
-    .japan-outcomes {
-      grid-column: 1 / -1;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1px;
-      background: var(--line);
-      border: 1px solid var(--line);
-    }
-    .outcome-item { padding: 12px 15px; background: #0b0f19; }
-    .outcome-item strong { display: block; color: var(--cyan); font-size: 11px; }
-    .outcome-item span { color: var(--muted); font-size: 10px; }
     .bracket-wrap {
       overflow-x: auto;
       padding: 4px max(20px, calc((100vw - 1380px)/2)) 28px;
@@ -732,7 +728,7 @@
       .hero-inner { grid-template-columns: 1fr; gap: 34px; padding-top: 70px; }
       .hero-card { max-width: 460px; }
       .section-head { align-items: start; flex-direction: column; }
-      .japan-grid, .info-strip, .japan-routes { grid-template-columns: 1fr; }
+      .info-strip { grid-template-columns: 1fr; }
       .nav-links { display: none; }
     }
     @media (max-width: 620px) {
@@ -750,8 +746,9 @@
       .fixture-row { grid-template-columns: 70px minmax(0, 1fr) auto minmax(0, 1fr); gap: 5px; }
       .channel { max-width: 100%; }
       .knockout-insights { width: min(100% - 28px, 1380px); }
-      .japan-outcomes { grid-template-columns: 1fr; }
-      .japan-route { min-height: 0; padding: 18px; }
+      .groups-disclosure summary { align-items: flex-start; flex-direction: column; padding: 18px; }
+      .groups-disclosure summary::after { align-self: stretch; justify-content: center; }
+      .groups-panel { padding: 0 14px 18px; }
     }
     @media (prefers-reduced-motion: reduce) {
       * { scroll-behavior: auto !important; }
@@ -765,7 +762,6 @@
       <div class="brand"><span class="brand-ball">◆</span> WC26 MATCH CENTER</div>
       <div class="nav-links">
         <a href="#today">今日の試合</a>
-        <a href="#japan">日本代表</a>
         <a href="#groups">予選リーグ</a>
         <a href="#bracket">決勝トーナメント</a>
         <a href="#watch">視聴方法</a>
@@ -825,32 +821,29 @@
       </div>
     </section>
 
-    <section class="section japan-strip" id="japan">
-      <div class="section-head">
-        <div>
-          <p class="kicker">SAMURAI BLUE / GROUP F</p>
-          <h2>日本代表、3つの決戦。</h2>
-        </div>
-        <p class="section-note">グループFの日本戦を抜き出して表示しています。日時はすべて日本時間。試合後は結果表示へ切り替わります。</p>
-      </div>
-      <div class="japan-grid" id="japan-grid">
-        <div class="empty-state">日本代表の日程を読み込んでいます。</div>
-      </div>
-    </section>
-
     <section class="groups-section" id="groups">
       <div class="section">
-        <div class="section-head">
-          <div>
-            <p class="kicker">GROUP STAGE / 72 MATCHES</p>
-            <h2>全12グループ。</h2>
+        <details class="groups-disclosure">
+          <summary>
+            <span class="groups-disclosure-title">
+              <strong>予選リーグ結果を見る</strong>
+              <span>全12グループの順位表とグループステージ72試合を、必要な時だけ開いて確認できます。</span>
+            </span>
+          </summary>
+          <div class="groups-panel">
+            <div class="section-head">
+              <div>
+                <p class="kicker">GROUP STAGE / 72 MATCHES</p>
+                <h2>全12グループ。</h2>
+              </div>
+              <p class="section-note">順位表と全72試合をグループごとに掲載。保存されている試合結果から勝点・得失点差・順位をページ内で計算します。</p>
+            </div>
+            <div class="group-filter" id="group-filter" aria-label="グループ絞り込み"></div>
+            <div class="groups-grid" id="groups-grid">
+              <div class="empty-state">グループ情報を読み込んでいます。</div>
+            </div>
           </div>
-          <p class="section-note">順位表と全72試合をグループごとに掲載。保存されている試合結果から勝点・得失点差・順位をページ内で計算します。</p>
-        </div>
-        <div class="group-filter" id="group-filter" aria-label="グループ絞り込み"></div>
-        <div class="groups-grid" id="groups-grid">
-          <div class="empty-state">グループ情報を読み込んでいます。</div>
-        </div>
+        </details>
       </div>
     </section>
 
@@ -868,7 +861,6 @@
           <span class="legend-chip provisional">暫定</span><span>現在その順位の国</span>
           <span class="legend-chip possible">可能性あり</span><span>残り試合で入る可能性がある国</span>
         </div>
-        <div class="japan-routes" id="japan-routes"></div>
       </div>
       <div class="broadcast-pending" id="broadcast-pending"></div>
       <div class="bracket-wrap" aria-label="決勝トーナメント表">
@@ -1261,10 +1253,8 @@
       advancement = window.WC26_ADVANCEMENT.project(events, BASELINE_SNAPSHOT.events);
       groups = advancement.groupList;
       renderToday();
-      renderJapan();
       renderGroups();
       renderBracket();
-      renderJapanRoutes();
       renderBroadcastNotice();
       updateHero();
     }
@@ -1278,13 +1268,6 @@
       $("today-grid").innerHTML = matches.length
         ? matches.map(matchCard).join("")
         : `<div class="empty-state">この日に予定されている試合はありません。</div>`;
-    }
-
-    function renderJapan() {
-      const matches = events.filter(event => event.slug === "group-stage" && hasTeam(event, "JPN"));
-      $("japan-grid").innerHTML = matches.length
-        ? matches.map(matchCard).join("")
-        : `<div class="empty-state">日本代表の日程を取得できませんでした。</div>`;
     }
 
     function stat(entry, name, fallback = "0") {
@@ -1407,62 +1390,6 @@
       return `<div class="bm-slot">
         <div class="bm-slot-main"><span class="bm-slot-team">${meta.flag} ${meta.name}</span></div>
       </div>`;
-    }
-
-    function rankRangeLabel(ranks) {
-      if (!ranks?.length) return "計算対象外";
-      const minimum = Math.min(...ranks);
-      const maximum = Math.max(...ranks);
-      return minimum === maximum ? `${minimum}位` : `${minimum}〜${maximum}位`;
-    }
-
-    function routeOpponentSummary(slot) {
-      if (slot.kind === "confirmed") {
-        return { primary:projectionTeamName(slot.primary), candidates:"対戦相手確定" };
-      }
-      if (slot.kind === "provisional") {
-        return {
-          primary:`暫定 ${projectionTeamName(slot.primary)}`,
-          candidates:slot.candidates.length ? `ほかの可能性: ${limitedCandidateNames(slot.candidates)}` : "現在の順位どおりならこの対戦"
-        };
-      }
-      return {
-        primary:slot.label,
-        candidates:slot.candidates?.length ? limitedCandidateNames(slot.candidates) : "対戦相手未定"
-      };
-    }
-
-    function renderJapanRoutes() {
-      const container = $("japan-routes");
-      const japan = advancement?.japan;
-      if (!japan?.entry) {
-        container.innerHTML = "";
-        return;
-      }
-
-      const routeCards = japan.routes.map(route => {
-        const event = events.find(item => Number(item.number) === route.match);
-        const opponent = routeOpponentSummary(route.opponent);
-        const activeClass = route.active ? "active" : "inactive";
-        return `<article class="japan-route ${activeClass}">
-          <div class="route-kicker">JAPAN / GROUP F ${route.rank === 1 ? "WINNER" : "RUNNER-UP"} ROUTE</div>
-          <div class="route-title">日本がF組${route.rank}位なら</div>
-          <div class="route-meta">MATCH ${route.match} / ${formatDateTime(new Date(event.date))}</div>
-          <div class="route-opponent">VS ${opponent.primary}</div>
-          <div class="route-candidates">${opponent.candidates}</div>
-        </article>`;
-      }).join("");
-
-      const outcomeLabels = { win:"勝利", draw:"引き分け", loss:"敗戦" };
-      const outcomes = Object.entries(japan.outcomes).map(([key, ranks]) => {
-        const topTwo = ranks.length > 0 && Math.max(...ranks) <= 2;
-        return `<div class="outcome-item">
-          <strong>${outcomeLabels[key]}</strong>
-          <span>${rankRangeLabel(ranks)} / ${topTwo ? "上位2位以内が確定" : "3位の可能性あり"}</span>
-        </div>`;
-      }).join("");
-
-      container.innerHTML = `${routeCards}${outcomes ? `<div class="japan-outcomes">${outcomes}</div>` : ""}`;
     }
 
     function renderBracket() {
