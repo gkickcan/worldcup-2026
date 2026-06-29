@@ -220,6 +220,42 @@
     .countdown div { padding: 10px 4px 8px; text-align: center; background: rgba(255,255,255,.07); }
     .countdown strong { display: block; font-size: 22px; line-height: 1; }
     .countdown span { color: var(--muted); font-size: 9px; font-weight: 900; letter-spacing: .1em; }
+    .japan-path {
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,.14);
+    }
+    .japan-path-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      color: var(--cyan);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .12em;
+    }
+    .japan-path-title span:last-child { color: var(--muted); font-size: 9px; }
+    .japan-path-list { display: grid; gap: 6px; }
+    .japan-path-step {
+      display: grid;
+      grid-template-columns: 74px minmax(0, 1fr);
+      gap: 8px;
+      padding: 9px 10px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.08);
+      border-left: 3px solid var(--cyan);
+    }
+    .japan-path-step.next {
+      background: rgba(255,49,88,.12);
+      border-color: rgba(255,49,88,.35);
+      border-left-color: var(--red);
+    }
+    .japan-path-round { color: var(--muted); font-size: 9px; font-weight: 900; }
+    .japan-path-main { min-width: 0; }
+    .japan-path-main strong { display: block; font-size: 12px; line-height: 1.25; }
+    .japan-path-main span { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; line-height: 1.35; }
 
     .data-bar {
       border-top: 1px solid var(--line);
@@ -630,6 +666,28 @@
       border-left-color: var(--red);
       box-shadow: 0 0 30px rgba(255,49,88,.08);
     }
+    .bracket-match.japan-path-next {
+      border-color: rgba(255,49,88,.72);
+      border-left-color: var(--red);
+      box-shadow: 0 0 34px rgba(255,49,88,.16);
+    }
+    .bracket-match.japan-path-future {
+      border-color: rgba(40,215,245,.5);
+      border-left-color: var(--cyan);
+      box-shadow: 0 0 28px rgba(40,215,245,.08);
+    }
+    .bm-route-label {
+      display: inline-flex;
+      margin-left: auto;
+      padding: 2px 6px;
+      color: #071018;
+      background: var(--cyan);
+      border-radius: 2px;
+      font-size: 8px;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+    .bm-route-label.next { color: #fff; background: var(--red); }
     .round:not(:last-child) .bracket-match::after {
       content: "";
       position: absolute;
@@ -791,6 +849,7 @@
           <div><strong>--</strong><span>MIN</span></div>
           <div><strong>--</strong><span>SEC</span></div>
         </div>
+        <div class="japan-path" id="japan-path"></div>
       </aside>
     </div>
   </header>
@@ -937,6 +996,7 @@
     let events = [...(initialSnapshot.events || [])].sort((a, b) => a.number - b.number);
     let groups = buildGroups(events);
     let advancement = null;
+    let japanPath = [];
     let selectedDay = dateKey(new Date());
     let activeGroup = "ALL";
     let nextJapanEvent = null;
@@ -1123,6 +1183,117 @@
       return Number(event.number);
     }
 
+    function isKnockoutEvent(event) {
+      return event.slug !== "group-stage" && event.slug !== "3rd-place-match";
+    }
+
+    function roundLabel(event) {
+      return {
+        "round-of-32":"ラウンド32",
+        "round-of-16":"ラウンド16",
+        quarterfinals:"準々決勝",
+        semifinals:"準決勝",
+        final:"決勝"
+      }[event.slug] || "決勝T";
+    }
+
+    function baselineEvent(number) {
+      return BASELINE_SNAPSHOT.events.find(event => Number(event.number) === Number(number));
+    }
+
+    function currentEvent(number) {
+      return events.find(event => Number(event.number) === Number(number));
+    }
+
+    function slotHasJapan(slot) {
+      return slot?.primary?.abbreviation === "JPN" || slot?.candidates?.some(team => team.abbreviation === "JPN");
+    }
+
+    function projectedJapanSide(event) {
+      const projected = advancement?.byMatch?.[eventNumber(event)];
+      if (!projected) return null;
+      if (slotHasJapan(projected.home)) return "home";
+      if (slotHasJapan(projected.away)) return "away";
+      return null;
+    }
+
+    function findJapanStartEvent() {
+      const now = new Date();
+      const actual = events
+        .filter(event => isKnockoutEvent(event) && hasTeam(event, "JPN") && (event.status.state === "in" || new Date(event.date) > now))
+        .sort((a, b) => new Date(a.date) - new Date(b.date))[0];
+      if (actual) return actual;
+
+      return events
+        .filter(event => event.slug === "round-of-32" && projectedJapanSide(event))
+        .sort((a, b) => new Date(a.date) - new Date(b.date))[0] || null;
+    }
+
+    function nextWinnerMatch(number) {
+      const nextBaseline = BASELINE_SNAPSHOT.events.find(event =>
+        isKnockoutEvent(event) &&
+        event.competitors.some(team => team.displayName === `Winner Match ${number}`)
+      );
+      return nextBaseline ? currentEvent(nextBaseline.number) : null;
+    }
+
+    function slotOpponentLabel(slot) {
+      if (!slot) return "対戦相手未定";
+      if (slot.kind === "confirmed") return projectionTeamName(slot.primary);
+      if (slot.kind === "provisional") {
+        const main = slot.primary ? `暫定 ${projectionTeamName(slot.primary)}` : slot.label;
+        return slot.candidates?.length ? `${main} ほか` : main;
+      }
+      if (slot.kind === "third") {
+        const provisional = slot.candidates?.filter(team => team.provisionalTopEight) || [];
+        return provisional.length ? `暫定 ${limitedCandidateNames(provisional, 2)}` : slot.label;
+      }
+      return slot.primary ? projectionTeamName(slot.primary) : localizePlaceholder(slot.label);
+    }
+
+    function routeOpponentLabel(event, previousMatchNumber = null) {
+      const projectedSide = projectedJapanSide(event);
+      if (projectedSide) {
+        const projected = advancement?.byMatch?.[eventNumber(event)];
+        return slotOpponentLabel(projectedSide === "home" ? projected.away : projected.home);
+      }
+
+      if (hasTeam(event, "JPN")) {
+        const opponent = event.competitors.find(team => team.abbreviation !== "JPN");
+        return opponent ? `${teamMeta(opponent).flag} ${teamMeta(opponent).name}` : "対戦相手未定";
+      }
+
+      const baseline = baselineEvent(eventNumber(event));
+      const previousLabel = previousMatchNumber ? `Winner Match ${previousMatchNumber}` : "";
+      const opponentIndex = baseline?.competitors.findIndex(team => team.displayName !== previousLabel) ?? -1;
+      const opponent = opponentIndex >= 0 ? event.competitors[opponentIndex] : null;
+      return opponent ? `${teamMeta(opponent).flag} ${teamMeta(opponent).name}` : "対戦相手未定";
+    }
+
+    function buildJapanPath() {
+      const start = findJapanStartEvent();
+      if (!start) return [];
+
+      const path = [];
+      const seen = new Set();
+      let event = start;
+      let previous = null;
+      while (event && !seen.has(eventNumber(event)) && event.slug !== "3rd-place-match") {
+        seen.add(eventNumber(event));
+        path.push({
+          event,
+          number:eventNumber(event),
+          round:roundLabel(event),
+          opponent:routeOpponentLabel(event, previous),
+          phase:path.length === 0 ? "next" : "future"
+        });
+        if (event.slug === "final") break;
+        previous = eventNumber(event);
+        event = nextWinnerMatch(previous);
+      }
+      return path;
+    }
+
     function statusInfo(event) {
       if (event.status.state === "in") return { label: event.status.detail || "LIVE", className: "live" };
       if (event.status.completed) return { label: event.status.detail || "試合終了", className: "done" };
@@ -1252,6 +1423,7 @@
     function renderAll() {
       advancement = window.WC26_ADVANCEMENT.project(events, BASELINE_SNAPSHOT.events);
       groups = advancement.groupList;
+      japanPath = buildJapanPath();
       renderToday();
       renderGroups();
       renderBracket();
@@ -1408,10 +1580,12 @@
                 const isThird = event.slug === "3rd-place-match";
                 const isProjected = event.slug === "round-of-32";
                 const projected = advancement?.byMatch[eventNumber(event)];
-                const japanRoute = advancement?.japan.routes.some(route => route.match === eventNumber(event) && route.active);
-                return `<article class="bracket-match ${isThird ? "third-place" : ""} ${isProjected ? "projected-match" : ""} ${japanRoute ? "japan-route-candidate" : ""}">
+                const japanRoute = japanPath.find(step => step.number === eventNumber(event));
+                const routeClass = japanRoute ? (japanRoute.phase === "next" ? "japan-path-next" : "japan-path-future") : "";
+                return `<article class="bracket-match ${isThird ? "third-place" : ""} ${isProjected ? "projected-match" : ""} ${routeClass}">
                   <div class="bm-meta">
                     <span>${isThird ? "3RD PLACE" : `M${eventNumber(event)}`} / ${formatDateTime(new Date(event.date))}</span>
+                    ${japanRoute ? `<span class="bm-route-label ${japanRoute.phase === "next" ? "next" : ""}">${japanRoute.phase === "next" ? "次の日本戦" : "日本ルート"}</span>` : ""}
                   </div>
                   ${isProjected
                     ? `${bracketProjectionRow(projected.home)}${bracketProjectionRow(projected.away)}`
@@ -1433,24 +1607,58 @@
       `;
     }
 
+    function renderJapanPath() {
+      const container = $("japan-path");
+      if (!japanPath.length) {
+        const hasFutureJapan = events.some(event => hasTeam(event, "JPN") && new Date(event.date) > new Date());
+        container.innerHTML = `<div class="japan-path-title"><span>JAPAN ROUTE</span><span>${hasFutureJapan ? "確定待ち" : "終了"}</span></div>
+          <div class="japan-path-list">
+            <div class="japan-path-step">
+              <div class="japan-path-round">日本代表</div>
+              <div class="japan-path-main"><strong>${hasFutureJapan ? "次の対戦カード確定を待っています" : "日本代表の今大会日程は終了"}</strong><span>結果が反映されると表示が更新されます。</span></div>
+            </div>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="japan-path-title"><span>日本が勝ち進むと</span><span>決勝まで</span></div>
+        <div class="japan-path-list">
+          ${japanPath.map(step => `
+            <div class="japan-path-step ${step.phase === "next" ? "next" : ""}">
+              <div class="japan-path-round">${step.round}<br>M${step.number}</div>
+              <div class="japan-path-main">
+                <strong>${formatDateTime(new Date(step.event.date))}</strong>
+                <span>${step.phase === "next" ? "次戦" : "勝てば次"} / VS ${step.opponent}</span>
+              </div>
+            </div>
+          `).join("")}
+        </div>`;
+    }
+
     function updateHero() {
       const now = new Date();
-      nextJapanEvent = events.find(event =>
+      nextJapanEvent = japanPath[0]?.event || events.find(event =>
         hasTeam(event, "JPN") &&
         (event.status.state === "in" || new Date(event.date) > now)
       );
       if (!nextJapanEvent) {
         $("hero-label").textContent = "SAMURAI BLUE";
-        $("next-date").textContent = "次の対戦カード確定を待っています";
+        $("next-date").textContent = "日本代表の今大会日程は終了";
         $("next-teams").textContent = "日本代表";
         $("countdown").innerHTML = "<div style='grid-column:1/-1'><strong>WC26</strong><span>THE ROAD CONTINUES</span></div>";
+        renderJapanPath();
         return;
       }
+      const pathStep = japanPath[0];
       const home = teamMeta(homeOf(nextJapanEvent));
       const away = teamMeta(awayOf(nextJapanEvent));
       $("hero-label").textContent = nextJapanEvent.status.state === "in" ? "JAPAN MATCH LIVE" : "NEXT JAPAN MATCH";
       $("next-date").textContent = `${formatDateTime(new Date(nextJapanEvent.date))} KICK OFF`;
-      $("next-teams").innerHTML = `${home.flag} ${home.name} <span style="color:var(--red)">VS</span> ${away.name} ${away.flag}`;
+      $("next-teams").innerHTML = hasTeam(nextJapanEvent, "JPN")
+        ? `${home.flag} ${home.name} <span style="color:var(--red)">VS</span> ${away.name} ${away.flag}`
+        : `🇯🇵 日本 <span style="color:var(--red)">VS</span> ${pathStep?.opponent || "対戦相手未定"}`;
+      renderJapanPath();
       updateCountdown();
     }
 
