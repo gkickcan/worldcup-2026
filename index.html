@@ -1024,25 +1024,35 @@
         target.displayName = source.displayName;
       };
 
-      events.filter(event => event.slug !== "group-stage").forEach(event => {
-        event.competitors.forEach(team => {
-          let match = team.displayName.match(/^(Winner|Loser) Match (\d+)$/i);
-          if (match) {
-            const source = byNumber.get(Number(match[2]));
-            if (!source?.status.completed) return;
-            const wantedWinner = match[1].toLowerCase() === "winner";
-            const resolved = source.competitors.find(item => wantedWinner ? item.winner : !item.winner);
-            if (resolved) copyIdentity(team, resolved);
-            return;
-          }
-          match = team.displayName.match(/^(Winner|Runner-up) Group ([A-L])$/i);
-          if (match) {
-            const rank = match[1].toLowerCase() === "winner" ? 1 : 2;
-            const resolved = groupRanks.get(`${match[2]}-${rank}`);
-            if (resolved) copyIdentity(team, resolved);
-          }
+      let changed = true;
+      while (changed) {
+        changed = false;
+        events.filter(event => event.slug !== "group-stage").forEach(event => {
+          event.competitors.forEach(team => {
+            let match = team.displayName.match(/^(Winner|Loser) Match (\d+)$/i);
+            if (match) {
+              const source = byNumber.get(Number(match[2]));
+              if (!source?.status.completed) return;
+              const wantedWinner = match[1].toLowerCase() === "winner";
+              const resolved = source.competitors.find(item => wantedWinner ? item.winner : !item.winner);
+              if (resolved && team.abbreviation !== resolved.abbreviation) {
+                copyIdentity(team, resolved);
+                changed = true;
+              }
+              return;
+            }
+            match = team.displayName.match(/^(Winner|Runner-up) Group ([A-L])$/i);
+            if (match) {
+              const rank = match[1].toLowerCase() === "winner" ? 1 : 2;
+              const resolved = groupRanks.get(`${match[2]}-${rank}`);
+              if (resolved && team.abbreviation !== resolved.abbreviation) {
+                copyIdentity(team, resolved);
+                changed = true;
+              }
+            }
+          });
         });
-      });
+      }
     }
 
     function loadData() {
@@ -1578,7 +1588,7 @@
             <div class="round-list">
               ${matches.map(event => {
                 const isThird = event.slug === "3rd-place-match";
-                const isProjected = event.slug === "round-of-32";
+                const isProjected = event.slug === "round-of-32" && event.status.state === "pre" && !event.status.completed;
                 const projected = advancement?.byMatch[eventNumber(event)];
                 const japanRoute = japanPath.find(step => step.number === eventNumber(event));
                 const routeClass = japanRoute ? (japanRoute.phase === "next" ? "japan-path-next" : "japan-path-future") : "";
