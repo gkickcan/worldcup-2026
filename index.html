@@ -849,7 +849,6 @@
           <div><strong>--</strong><span>MIN</span></div>
           <div><strong>--</strong><span>SEC</span></div>
         </div>
-        <div class="japan-path" id="japan-path"></div>
       </aside>
     </div>
   </header>
@@ -955,7 +954,7 @@
       <a href="https://www.jfa.jp/samuraiblue/worldcup_2026/tv.html" target="_blank" rel="noreferrer">JFA放送情報</a> /
       <a href="https://en.wikipedia.org/wiki/2026_FIFA_World_Cup" target="_blank" rel="noreferrer">Wikipedia（CC BY-SA 4.0）</a>
     </p>
-    <p>放送情報確認日: 2026年6月26日。非公式ファン制作ページです。Wikipediaは速報元のため、結果の反映が遅れたり後から訂正されたりする場合があります。未発表の放送カードは推測で表示していません。視聴前に各放送局の番組表もご確認ください。</p>
+    <p>放送情報確認日: 2026年7月2日。非公式ファン制作ページです。Wikipediaは速報元のため、結果の反映が遅れたり後から訂正されたりする場合があります。未発表の放送カードは推測で表示していません。視聴前に各放送局の番組表もご確認ください。</p>
   </footer>
 
   <script src="match-data.js"></script>
@@ -1318,14 +1317,15 @@
         slot?.primary?.abbreviation === "JPN" || slot?.candidates?.some(team => team.abbreviation === "JPN")
       );
       const hasJapanPath = hasTeam(event, "JPN") || japanProjected;
+      const hasFutureJapanPath = hasJapanPath && !event.status.completed;
 
-      if (hasJapanPath && event.slug === "round-of-32") {
+      if (hasFutureJapanPath && event.slug === "round-of-32") {
         records.push(
           { broadcaster:"フジテレビ系", medium:"tv", mode:"live", start:null, confirmed:true, note:"日本進出時・開始時刻未発表" },
           { broadcaster:"NHK BS", medium:"tv", mode:"live", start:null, confirmed:true, note:"日本進出時・開始時刻未発表" }
         );
       }
-      if (hasTeam(event, "JPN") && ["round-of-16", "quarterfinals", "semifinals"].includes(event.slug)) {
+      if (hasTeam(event, "JPN") && !event.status.completed && ["round-of-16", "quarterfinals", "semifinals"].includes(event.slug)) {
         records.push({
           broadcaster:"NHK総合", medium:"tv", mode:"live", start:null,
           confirmed:true, note:"日本進出時・開始時刻未発表"
@@ -1333,13 +1333,13 @@
       }
 
       records.forEach(record => {
-        if (record.broadcaster === "DAZN" && hasJapanPath) {
+        if (record.broadcaster === "DAZN" && hasFutureJapanPath) {
           record.broadcaster = "DAZN 無料";
         }
       });
 
       const priority = {
-        "NHK総合": 1, "日本テレビ系": 2, "フジテレビ系": 3, "NHK BS": 4,
+        "NHK総合": 1, "NHK Eテレ": 1.5, "日本テレビ系": 2, "フジテレビ系": 3, "NHK BS": 4,
         "NHK BSプレミアム4K": 5, "DAZN": 6, "DAZN 無料": 6
       };
       return records
@@ -1619,6 +1619,7 @@
 
     function renderJapanPath() {
       const container = $("japan-path");
+      if (!container) return;
       if (!japanPath.length) {
         const hasFutureJapan = events.some(event => hasTeam(event, "JPN") && new Date(event.date) > new Date());
         container.innerHTML = `<div class="japan-path-title"><span>JAPAN ROUTE</span><span>${hasFutureJapan ? "確定待ち" : "終了"}</span></div>
