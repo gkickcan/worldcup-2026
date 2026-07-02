@@ -67,6 +67,17 @@
     return score.home <= 30 && score.away <= 30 ? score : null;
   }
 
+  function parseMatchNumber(scoreText, box, index) {
+    const match = scoreText.match(/\bMatch\s+(\d+)\b/i);
+    if (match) return Number(match[1]);
+
+    const reportCell = [...box.querySelectorAll("tr.fgoals")]
+      .map(row => cleanText(row.children[1]))
+      .find(text => /\bReport\s+\d+\b/i.test(text));
+    const report = reportCell?.match(/\bReport\s+(\d+)\b/i);
+    return report ? Number(report[1]) : index + 1;
+  }
+
   function parsePenaltyScore(box) {
     const rows = [...box.querySelectorAll("tr")];
     const headingIndex = rows.findIndex(row => cleanText(row).toLowerCase() === "penalties");
@@ -84,12 +95,11 @@
       throw new Error(`試合数が${boxes.length}件でした`);
     }
 
-    return boxes.map(box => {
+    return boxes.map((box, index) => {
       const scoreText = cleanText(box.querySelector(".fscore"));
       const result = parseScore(scoreText);
-      const matchNumber = scoreText.match(/Match\s+(\d+)/i);
       return {
-        number: matchNumber ? Number(matchNumber[1]) : null,
+        number: parseMatchNumber(scoreText, box, index),
         date: parseKickoff(
           cleanText(box.querySelector(".bday")),
           cleanText(box.querySelector(".ftime"))
@@ -129,8 +139,8 @@
       }
 
       const number = Number(baseline.number);
-      if (usedNumbers.has(number) || !sameKickoff(remote.date, baseline.date)) {
-        throw new Error(`MATCH ${number} の日時または重複を確認できません`);
+      if (usedNumbers.has(number)) {
+        throw new Error(`MATCH ${number} の重複を確認できません`);
       }
       if (baseline.slug === "group-stage" && !isGroupTeamMatch(remote, baseline)) {
         throw new Error(`MATCH ${number} の対戦国が一致しません`);
@@ -174,6 +184,7 @@
       const away = event.competitors.find(team => team.homeAway === "away");
       applyRemoteTeam(home, remote.homeName);
       applyRemoteTeam(away, remote.awayName);
+      event.date = remote.date;
 
       if (!remote.result) return;
       home.score = String(remote.result.home);
@@ -201,10 +212,14 @@
     if (!snapshot || !Array.isArray(snapshot.events) || snapshot.events.length !== EXPECTED_MATCHES) return false;
     const baselineByNumber = new Map(baselineSnapshot.events.map(event => [Number(event.number), event]));
     const numbers = new Set();
+    const tournamentStart = Date.UTC(2026, 5, 10);
+    const tournamentEnd = Date.UTC(2026, 6, 21);
     return snapshot.events.every(event => {
       const number = Number(event.number);
       const baseline = baselineByNumber.get(number);
-      if (!baseline || numbers.has(number) || !sameKickoff(event.date, baseline.date) ||
+      const kickoff = new Date(event.date).getTime();
+      if (!baseline || numbers.has(number) || !Number.isFinite(kickoff) ||
+          kickoff < tournamentStart || kickoff > tournamentEnd ||
           !Array.isArray(event.competitors) || event.competitors.length !== 2) return false;
       if (event.status?.completed && event.competitors.some(team =>
         !Number.isInteger(Number(team.score)) || Number(team.score) < 0 || Number(team.score) > 30
