@@ -839,17 +839,6 @@
         </div>
       </div>
 
-      <aside class="hero-card" aria-label="次の日本代表戦">
-        <div class="live-label" id="hero-label">NEXT JAPAN MATCH</div>
-        <div class="next-date" id="next-date">最新日程を読み込んでいます</div>
-        <div class="next-teams" id="next-teams">日本代表の次戦</div>
-        <div class="countdown" id="countdown">
-          <div><strong>--</strong><span>DAYS</span></div>
-          <div><strong>--</strong><span>HOURS</span></div>
-          <div><strong>--</strong><span>MIN</span></div>
-          <div><strong>--</strong><span>SEC</span></div>
-        </div>
-      </aside>
     </div>
   </header>
 
@@ -1648,6 +1637,7 @@
     }
 
     function updateHero() {
+      if (!$("hero-label")) return;
       const now = new Date();
       nextJapanEvent = japanPath[0]?.event || events.find(event =>
         hasTeam(event, "JPN") &&
@@ -1674,6 +1664,7 @@
     }
 
     function updateCountdown() {
+      if (!$("countdown")) return;
       if (!nextJapanEvent || nextJapanEvent.status.state === "in") {
         if (nextJapanEvent?.status.state === "in") {
           $("countdown").innerHTML = "<div style='grid-column:1/-1'><strong>LIVE</strong><span>NOW PLAYING</span></div>";
