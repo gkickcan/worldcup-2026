@@ -70,6 +70,7 @@
   function parseMatchNumber(scoreText, box, index) {
     const match = scoreText.match(/\bMatch\s+(\d+)\b/i);
     if (match) return Number(match[1]);
+    if (index < 72) return null;
 
     const reportCell = [...box.querySelectorAll("tr.fgoals")]
       .map(row => cleanText(row.children[1]))
